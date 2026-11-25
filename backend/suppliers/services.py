@@ -5,7 +5,7 @@ class SupplierService:
 
     @staticmethod
     def create_supplier(validated_data):
-        return SupplierRepository.create(**validated_data)
+        return SupplierRepository.create(validated_data)
 
     @staticmethod
     def get_all_suppliers():

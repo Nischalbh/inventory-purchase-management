@@ -24,7 +24,7 @@ class InventoryRepository:
     def get_all_transactions():
         return InventoryTransaction.objects.select_related(
             "product", "created_by"
-        ).order_by("-created_at")
+        ).order_by("-created_at", "-id")
 
     @staticmethod
     def get_transaction_by_id(transaction_id):

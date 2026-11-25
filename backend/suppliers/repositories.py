@@ -9,7 +9,7 @@ class SupplierRepository:
 
     @staticmethod
     def get_all():
-        return Supplier.objects.all().order_by("-created_at")
+        return Supplier.objects.all().order_by("-created_at", "-id")
 
     @staticmethod
     def get_by_id(supplier_id):

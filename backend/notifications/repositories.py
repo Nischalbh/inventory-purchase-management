@@ -9,7 +9,9 @@ class NotificationRepository:
 
     @staticmethod
     def get_all():
-        return Notification.objects.select_related("product").order_by("-created_at")
+        return Notification.objects.select_related("product").order_by(
+            "-created_at", "-id"
+        )
 
     @staticmethod
     def get_by_id(notification_id):

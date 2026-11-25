@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from accounts.permissions import IsManager
+from core.pagination import paginate_api_queryset
 
 from .serializers import SupplierSerializer
 from .services import SupplierService
@@ -14,8 +15,13 @@ class SupplierListCreateView(APIView):
 
     def get(self, request):
         suppliers = SupplierService.get_all_suppliers()
-        serializer = SupplierSerializer(suppliers, many=True)
 
+        paginator, page = paginate_api_queryset(request, suppliers, self)
+        if page is not None:
+            serializer = SupplierSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
+        serializer = SupplierSerializer(suppliers, many=True)
         return Response(serializer.data)
 
     def post(self, request):

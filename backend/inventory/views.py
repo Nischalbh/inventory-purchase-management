@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from core.pagination import paginate_api_queryset
+
 from .serializers import InventoryTransactionSerializer
 from .services import InventoryService
 
@@ -21,6 +23,11 @@ class InventoryTransactionListCreateView(APIView):
 
         if transaction_type:
             transactions = transactions.filter(transaction_type=transaction_type)
+
+        paginator, page = paginate_api_queryset(request, transactions, self)
+        if page is not None:
+            serializer = InventoryTransactionSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
         serializer = InventoryTransactionSerializer(transactions, many=True)
 

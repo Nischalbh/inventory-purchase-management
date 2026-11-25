@@ -12,7 +12,7 @@ class PurchaseOrderRepository:
         return (
             PurchaseOrder.objects.select_related("supplier")
             .prefetch_related("items__product")
-            .order_by("-created_at")
+            .order_by("-created_at", "-id")
         )
 
     @staticmethod
@@ -45,8 +45,10 @@ class PurchaseOrderItemRepository:
 
     @staticmethod
     def get_by_order(order):
-        return PurchaseOrderItem.objects.filter(purchase_order=order).select_related(
-            "product"
+        return (
+            PurchaseOrderItem.objects.filter(purchase_order=order)
+            .select_related("product")
+            .order_by("id")
         )
 
     @staticmethod

@@ -2,6 +2,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 
+from core.pagination import paginate_api_queryset
+
 from .serializers import NotificationSerializer
 from .services import NotificationService
 
@@ -12,6 +14,11 @@ class NotificationListView(APIView):
 
     def get(self, request):
         notifications = NotificationService.get_all_notifications()
+
+        paginator, page = paginate_api_queryset(request, notifications, self)
+        if page is not None:
+            serializer = NotificationSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
         serializer = NotificationSerializer(notifications, many=True)
 

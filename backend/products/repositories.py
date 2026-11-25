@@ -9,7 +9,7 @@ class ProductRepository:
 
     @staticmethod
     def get_all():
-        return Product.objects.all().order_by("-created_at")
+        return Product.objects.all().order_by("-created_at", "-id")
 
     @staticmethod
     def get_by_id(product_id):

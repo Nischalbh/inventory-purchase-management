@@ -9,7 +9,7 @@ class AuditLogRepository:
 
     @staticmethod
     def get_all():
-        return AuditLog.objects.select_related("user").all()
+        return AuditLog.objects.select_related("user").order_by("-created_at", "-id")
 
     @staticmethod
     def get_by_id(log_id):

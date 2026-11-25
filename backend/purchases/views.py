@@ -3,6 +3,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from accounts.permissions import IsManager
+from core.pagination import paginate_api_queryset
 
 from .serializers import PurchaseOrderSerializer, PurchaseOrderItemSerializer
 from .services import PurchaseOrderService, PurchaseOrderItemService
@@ -14,6 +15,12 @@ class PurchaseOrderListCreateView(APIView):
 
     def get(self, request):
         orders = PurchaseOrderService.get_all_orders()
+
+        paginator, page = paginate_api_queryset(request, orders, self)
+        if page is not None:
+            serializer = PurchaseOrderSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
+
         serializer = PurchaseOrderSerializer(orders, many=True)
         return Response(serializer.data)
 
@@ -99,6 +106,11 @@ class PurchaseOrderItemListCreateView(APIView):
             )
 
         items = PurchaseOrderItemService.get_order_items(order)
+
+        paginator, page = paginate_api_queryset(request, items, self)
+        if page is not None:
+            serializer = PurchaseOrderItemSerializer(page, many=True)
+            return paginator.get_paginated_response(serializer.data)
 
         return Response(PurchaseOrderItemSerializer(items, many=True).data)
 

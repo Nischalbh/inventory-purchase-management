@@ -50,7 +50,7 @@ INSTALLED_APPS = [
     "purchases",
     "inventory",
     "notifications",
-    "audit",
+    "audit.apps.AuditConfig",
 ]
 
 MIDDLEWARE = [

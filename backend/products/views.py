@@ -1,9 +1,8 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
+
+from accounts.permissions import IsManager
 
 from .serializers import ProductSerializer
 from .services import ProductService
@@ -11,9 +10,10 @@ from .services import ProductService
 
 class ProductListCreateView(APIView):
 
+    permission_classes = [IsManager]
+
     def get(self, request):
         products = ProductService.get_all_products()
-
         serializer = ProductSerializer(products, many=True)
 
         return Response(serializer.data)
@@ -24,14 +24,16 @@ class ProductListCreateView(APIView):
         if serializer.is_valid():
             product = ProductService.create_product(serializer.validated_data)
 
-            response_serializer = ProductSerializer(product)
-
-            return Response(response_serializer.data, status=status.HTTP_201_CREATED)
+            return Response(
+                ProductSerializer(product).data, status=status.HTTP_201_CREATED
+            )
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProductDetailView(APIView):
+
+    permission_classes = [IsManager]
 
     def get_object(self, product_id):
         return ProductService.get_product_by_id(product_id)
@@ -44,9 +46,7 @@ class ProductDetailView(APIView):
                 {"detail": "Product not found."}, status=status.HTTP_404_NOT_FOUND
             )
 
-        serializer = ProductSerializer(product)
-
-        return Response(serializer.data)
+        return Response(ProductSerializer(product).data)
 
     def put(self, request, product_id):
         return self.update_product(request, product_id, partial=False)

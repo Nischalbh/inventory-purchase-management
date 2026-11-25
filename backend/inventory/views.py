@@ -1,8 +1,6 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import InventoryTransactionSerializer
 from .services import InventoryService
@@ -10,8 +8,9 @@ from .services import InventoryService
 
 class InventoryTransactionListCreateView(APIView):
 
-    def get(self, request):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
         transactions = InventoryService.get_all_transactions()
 
         product_id = request.query_params.get("product")
@@ -28,15 +27,11 @@ class InventoryTransactionListCreateView(APIView):
         return Response(serializer.data)
 
     def post(self, request):
-
         serializer = InventoryTransactionSerializer(data=request.data)
 
         if serializer.is_valid():
-
-            user = request.user if request.user.is_authenticated else None
-
             inventory_transaction = InventoryService.create_transaction(
-                serializer.validated_data, user
+                serializer.validated_data, request.user
             )
 
             return Response(
@@ -48,8 +43,9 @@ class InventoryTransactionListCreateView(APIView):
 
 class InventoryTransactionDetailView(APIView):
 
-    def get(self, request, transaction_id):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, transaction_id):
         inventory_transaction = InventoryService.get_transaction_by_id(transaction_id)
 
         if not inventory_transaction:

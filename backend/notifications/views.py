@@ -1,8 +1,6 @@
-from django.shortcuts import render
-
-# Create your views here.
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 
 from .serializers import NotificationSerializer
 from .services import NotificationService
@@ -10,8 +8,9 @@ from .services import NotificationService
 
 class NotificationListView(APIView):
 
-    def get(self, request):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
         notifications = NotificationService.get_all_notifications()
 
         serializer = NotificationSerializer(notifications, many=True)
@@ -21,8 +20,9 @@ class NotificationListView(APIView):
 
 class NotificationDetailView(APIView):
 
-    def get(self, request, notification_id):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request, notification_id):
         notification = NotificationService.get_notification_by_id(notification_id)
 
         if not notification:
@@ -31,7 +31,6 @@ class NotificationDetailView(APIView):
         return Response(NotificationSerializer(notification).data)
 
     def patch(self, request, notification_id):
-
         notification = NotificationService.get_notification_by_id(notification_id)
 
         if not notification:
@@ -44,8 +43,9 @@ class NotificationDetailView(APIView):
 
 class UnreadNotificationCountView(APIView):
 
-    def get(self, request):
+    permission_classes = [IsAuthenticated]
 
+    def get(self, request):
         count = NotificationService.get_unread_count()
 
         return Response({"unread_count": count})

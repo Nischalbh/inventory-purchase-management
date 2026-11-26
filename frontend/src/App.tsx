@@ -2,6 +2,7 @@
 import Sidebar from "./components/layout/Sidebar";
 import Navbar from "./components/layout/Navbar";
 import DashboardStats from "./features/dashboard/DashboardStats";
+import RecentOrders from "./features/dashboard/RecentOrders"
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           </div>
 
           <DashboardStats />
+          <RecentOrders />
         </div>
       </main>
     </div>

@@ -1,58 +1,42 @@
 
 import { Eye } from "lucide-react";
+import type { PurchaseOrder } from "./dashboard.types";
 
-const orders = [
-{
-    id: "PO-1001",
-    supplier: "Tech Solutions Pvt. Ltd.",
-    date: "Nov 25, 2026",
-    amount: "Rs. 45,000",
-    status: "Completed",
-},
-{
-    id: "PO-1002",
-    supplier: "Global Traders",
-    date: "Nov 24, 2026",
-    amount: "Rs. 28,500",
-    status: "Pending",
-},
-{
-    id: "PO-1003",
-    supplier: "ABC Suppliers",
-    date: "Nov 23, 2026",
-    amount: "Rs. 62,000",
-    status: "Processing",
-},
-{
-    id: "PO-1004",
-    supplier: "Smart Electronics",
-    date: "Nov 22, 2026",
-    amount: "Rs. 18,000",
-    status: "Completed",
-},
-];
+interface Props {
+orders: PurchaseOrder[];
+onViewOrder?: (order: PurchaseOrder) => void;
+}
 
-function RecentOrders() {
+function RecentOrders({ orders, onViewOrder }: Props) {
+const recentOrders = [...orders]
+    .sort(
+    (a, b) =>
+        new Date(b.order_date).getTime() -
+        new Date(a.order_date).getTime()
+    )
+    .slice(0, 5);
+
+const statusStyles: Record<string, string> = {
+    DRAFT: "bg-slate-100 text-slate-600",
+    SUBMITTED: "bg-blue-100 text-blue-700",
+    RECEIVED: "bg-green-100 text-green-700",
+    CANCELLED: "bg-red-100 text-red-700",
+};
+
 return (
     <div className="mt-8 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-    <div className="flex items-center justify-between border-b border-slate-200 p-6">
-        <div>
-        <h2 className="text-lg font-semibold text-slate-800">
-            Recent Purchase Orders
+    <div className="border-b border-slate-200 p-6">
+        <h2 className="text-lg font-bold text-slate-800">
+        Recent Purchase Orders
         </h2>
         <p className="mt-1 text-sm text-slate-500">
-            Latest purchase activities
+        Latest purchase activities
         </p>
-        </div>
-
-        <button className="text-sm font-medium text-blue-600 hover:text-blue-700">
-        View All
-        </button>
     </div>
 
     <div className="overflow-x-auto">
         <table className="w-full text-left text-sm">
-        <thead className="bg-slate-50 text-xs uppercase text-slate-500">
+        <thead className="bg-slate-50 text-slate-500">
             <tr>
             <th className="px-6 py-4">Order ID</th>
             <th className="px-6 py-4">Supplier</th>
@@ -64,45 +48,49 @@ return (
         </thead>
 
         <tbody className="divide-y divide-slate-100">
-            {orders.map((order) => (
-            <tr key={order.id} className="hover:bg-slate-50">
-                <td className="px-6 py-4 font-medium text-slate-800">
-                {order.id}
-                </td>
-
-                <td className="px-6 py-4 text-slate-600">
-                {order.supplier}
-                </td>
-
-                <td className="px-6 py-4 text-slate-500">
-                {order.date}
-                </td>
-
-                <td className="px-6 py-4 font-medium text-slate-800">
-                {order.amount}
-                </td>
-
-                <td className="px-6 py-4">
-                <span
-                    className={`rounded-full px-3 py-1 text-xs font-medium ${
-                    order.status === "Completed"
-                        ? "bg-green-100 text-green-700"
-                        : order.status === "Pending"
-                        ? "bg-yellow-100 text-yellow-700"
-                        : "bg-blue-100 text-blue-700"
-                    }`}
-                >
-                    {order.status}
-                </span>
-                </td>
-
-                <td className="px-6 py-4">
-                <button className="text-slate-500 hover:text-blue-600">
-                    <Eye size={18} />
-                </button>
+            {recentOrders.length === 0 ? (
+            <tr>
+                <td colSpan={6} className="px-6 py-8 text-center text-slate-500">
+                No purchase orders found.
                 </td>
             </tr>
-            ))}
+            ) : (
+            recentOrders.map((order) => (
+                <tr key={order.id} className="hover:bg-slate-50">
+                <td className="px-6 py-4 font-medium text-slate-800">
+                    {order.order_number}
+                </td>
+                <td className="px-6 py-4 text-slate-600">
+                    {order.supplier_name}
+                </td>
+                <td className="px-6 py-4 text-slate-600">
+                    {new Date(order.order_date).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 font-medium text-slate-800">
+                    {Number(order.total_amount || 0).toLocaleString()}
+                </td>
+                <td className="px-6 py-4">
+                    <span
+                    className={`rounded-full px-3 py-1 text-xs font-medium ${
+                        statusStyles[order.status] ||
+                        "bg-slate-100 text-slate-600"
+                    }`}
+                    >
+                    {order.status}
+                    </span>
+                </td>
+                <td className="px-6 py-4">
+                    <button
+                    title="View order"
+                    onClick={() => onViewOrder?.(order)}
+                    className="text-slate-500 hover:text-blue-600"
+                    >
+                    <Eye size={18} />
+                    </button>
+                </td>
+                </tr>
+            ))
+            )}
         </tbody>
         </table>
     </div>
